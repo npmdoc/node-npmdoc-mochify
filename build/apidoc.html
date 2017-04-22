@@ -1,0 +1,282 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/mantoni/mochify.js"
+
+    >mochify (v3.1.1)</a>
+</h1>
+<h4>TDD with Browserify, Mocha, PhantomJS and WebDriver</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.mochify">module mochify</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.mochify.mochify">
+            function <span class="apidocSignatureSpan"></span>mochify
+            <span class="apidocSignatureSpan">(_, opts)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.mochify" id="apidoc.module.mochify">module mochify</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.mochify.mochify" id="apidoc.element.mochify.mochify">
+        function <span class="apidocSignatureSpan"></span>mochify
+        <span class="apidocSignatureSpan">(_, opts)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">mochify = function (_, opts) {
+  if (_ === null) {
+    _ = &#x27;./test/*.js&#x27;;
+  } else if (typeof _ !== &#x27;string&#x27;) {
+    opts = _;
+    _ = &#x27;./test/*.js&#x27;;
+  }
+  if (!opts) {
+    opts = {};
+  }
+  if (!opts.output) {
+    opts.output = process.stdout;
+  }
+  if (opts.recursive) {
+    if (!_) {
+      _ = &#x27;./test/**/*.js&#x27;;
+    } else {
+      var p = _.indexOf(&#x27;*&#x27;);
+      if (p === -1) {
+        _ += &#x27;/**/*.js&#x27;;
+      } else {
+        _ = _.substring(0, p) + &#x27;**/&#x27; + _.substring(p);
+      }
+    }
+  }
+
+  Object.keys(args.defaults).forEach(function (key) {
+    if (!opts.hasOwnProperty(key)) {
+      opts[key] = args.defaults[key];
+    }
+  });
+
+  if (opts.debug) {
+    if (opts.node) {
+      console.log(&#x27;--debug does not work with --node\n&#x27;);
+      process.exit(1);
+    }
+    if (opts.wd) {
+      console.log(&#x27;--debug does not work with --wd\n&#x27;);
+      process.exit(1);
+    }
+  }
+
+  if (opts.bundle &#x26;&#x26; !opts.consolify) {
+    console.log(&#x27;--bundle must be used with --consolify option\n&#x27;);
+    process.exit(1);
+  }
+
+  if (opts.invert &#x26;&#x26; !opts.grep) {
+    console.log(&#x27;--invert must be used with --grep option\n&#x27;);
+    process.exit(1);
+  }
+
+  var entries = [];
+  var globs = _.split(&#x27; &#x27;);
+  globs.forEach(function (arg) {
+    if (arg.indexOf(&#x27;*&#x27;) === -1) {
+      entries.push(arg);
+    } else {
+      Array.prototype.push.apply(entries, glob.sync(arg, opts.glob || {}));
+    }
+  });
+  if (!entries.length) {
+    console.error(&#x27;Error: Nothing found for &#x22;&#x27; + globs.join(&#x27;&#x22; or &#x22;&#x27;) + &#x27;&#x22;.\n&#x27;);
+    process.exit(1);
+  }
+
+  function error(err) {
+    console.error(String(err) + &#x27;\n&#x27;);
+    process.exitCode = 1;
+  }
+
+  var brOpts = {
+    debug        : true,
+    cache        : {},
+    packageCache : {}
+  };
+
+  if (opts.node) {
+    brOpts.builtins = false;
+    brOpts.commondir = false;
+    brOpts.detectGlobals = false;
+    brOpts.insertGlobalVars = [&#x27;__dirname&#x27;, &#x27;__filename&#x27;];
+  }
+  brOpts.extensions = opts.extension;
+  brOpts.browserField = opts[&#x27;browser-field&#x27;];
+  brOpts.paths = opts.path;
+
+  var b = browserify(brOpts);
+
+  var mocaccinoOpts = {
+    reporter        : opts.reporter,
+    reporterOptions : opts.reporterOptions,
+    ui              : opts.ui,
+    node            : opts.node,
+    yields          : opts.yields,
+    timeout         : opts.timeout,
+    grep            : opts.grep,
+    invert          : opts.invert,
+    colors          : opts.colors,
+    noColors        : opts.noColors
+  };
+
+  if (opts.consolify) {
+    b.plugin(consolify, opts);
+  } else if (opts.node) {
+    b.plugin(node, opts);
+  } else if (opts.wd) {
+    var wdOpts = {};
+    if (opts.url) {
+      wdOpts.url = opts.url;
+    }
+    if (opts[&#x27;wd-file&#x27;]) {
+      wdOpts.wdFile = opts[&#x27;wd-file&#x27;];
+    }
+    b.plugin(webdriver, wdOpts);
+    if (process.stdout.getWindowSize) {
+      mocaccinoOpts.windowWidth = process.stdout.getWindowSize()[0];
+    }
+    b.pipeline.get(&#x27;wrap&#x27;).push(trace());
+  } else {
+    b.plugin(phantom, opts);
+  }
+
+  entries.forEach(function (entry) {
+    b.add(entry);
+  });
+
+  b.plugin(mocaccino, mocaccinoOpts);
+
+  if (opts.external) {
+    [].concat(opts.external).forEach(function (x) {
+      b.external(x);
+    });
+  }
+  if (opts.plugin) {
+    [].concat(opts.plugin).forEach(function (p) {
+      if (typeof p === &#x27;string&#x27;) {
+        b.plugin(p, {});
+      } else {
+        b.plugin(p._.shift(), p);
+      }
+    });
+  }
+  if (opts.transform) {
+    [].concat(opts.transform).forEach(function (t) {
+      if (typeof t === &#x27;string&#x27;) {
+        b.transform({}, t);
+      } else {
+        b.transform(t, t._.shift());
+      }
+    });
+  }
+  if (opts.require) {
+    [].concat(opts.require).forEach(function (r) {
+      b.require(resolve.sync(r, {
+        basedir: process.cwd()
+      }), {
+        expose: r
+      });
+    });
+  }
+
+  if (opts.cover) {
+    b.transform(coverify);
+    b.plugin(cover);
+  }
+
+  b.on(&#x27;error&#x27;, error);
+  b.on(&#x27;bundle&#x27;, function (out) {
+    out.on(&#x27;error&#x27;, error);
+    out.pipe(opts.output);
+  });
+
+  if (opts.watch) {
+    var w = watchify(b);
+    var bundling = false;
+    var queued = false;
+
+    var bundle = function () {
+      if (!bundling) {
+        bundling = true;
+        b.bundle ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
