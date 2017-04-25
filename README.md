@@ -1,6 +1,6 @@
 # npmdoc-mochify
 
-#### api documentation for  [mochify (v3.1.1)](https://github.com/mantoni/mochify.js)  [![npm package](https://img.shields.io/npm/v/npmdoc-mochify.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-mochify) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-mochify.svg)](https://travis-ci.org/npmdoc/node-npmdoc-mochify)
+#### basic api documentation for  [mochify (v3.1.1)](https://github.com/mantoni/mochify.js)  [![npm package](https://img.shields.io/npm/v/npmdoc-mochify.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-mochify) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-mochify.svg)](https://travis-ci.org/npmdoc/node-npmdoc-mochify)
 
 #### TDD with Browserify, Mocha, PhantomJS and WebDriver
 
